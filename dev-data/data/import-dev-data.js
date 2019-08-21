@@ -3,13 +3,16 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Tour = require('../../models/tourModel');
 
+// Load config file
 dotenv.config({ path: './config.env' });
 
-// CONNECT TO DATABASE
+// Generate link
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
 );
+
+// Connect to database
 mongoose
   .connect(DB, {
     useCreateIndex: true,
@@ -23,27 +26,26 @@ mongoose
     console.log('DB connection error.', err);
   });
 
-// READ JSON FILE
+// Read JSON file with tours data
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
 );
-// console.log(tours);
 
-// IMPORT DATA INTO DB
+// Import collections into tours document function
 const importData = async () => {
   try {
-    await Tour.create(tours);
+    await Tour.create(tours); // Create many tours
     console.log('Data successfuly loaded!');
-    process.exit(); // EXIT APPLICATION
+    process.exit(); // Force exit application
   } catch (err) {
     console.log(err);
   }
 };
 
-// DELETE ALL DATA FROM COLLECTION
+// Delete document data function
 const deleteData = async () => {
   try {
-    await Tour.deleteMany();
+    await Tour.deleteMany(); // Delete all tours
     console.log('Data successfuly deleted!');
     process.exit(); // EXIT APPLICATION
   } catch (err) {
@@ -51,7 +53,7 @@ const deleteData = async () => {
   }
 };
 
-// REACT TO CMD ARGUMENT
+// React to command arguments 'node run this-file.js --import'
 if (process.argv[2] === '--import') {
   importData();
 } else if (process.argv[2] === '--delete') {

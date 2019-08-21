@@ -3,11 +3,14 @@ const APIFeatures = require('../utils/apiFeatures');
 
 exports.getAllTours = async (req, res) => {
   try {
+    // Generate query based on request params
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
+
+    // Run created query
     const tours = await features.query;
 
     res.status(201).json({
@@ -27,7 +30,9 @@ exports.getAllTours = async (req, res) => {
 
 exports.getTour = async (req, res) => {
   try {
+    // Find document by id
     const tour = await Tour.findById(req.params.id);
+
     res.status(201).json({
       status: 'success',
       data: {
@@ -44,7 +49,9 @@ exports.getTour = async (req, res) => {
 
 exports.createTour = async (req, res) => {
   try {
+    // Create document using requested data
     const newTour = await Tour.create(req.body);
+
     res.status(201).json({
       status: 'success',
       data: {
@@ -62,8 +69,8 @@ exports.createTour = async (req, res) => {
 exports.updateTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
+      new: true, // If not found - add new
+      runValidators: true // Validate data
     });
 
     res.status(201).json({
@@ -82,10 +89,13 @@ exports.updateTour = async (req, res) => {
 
 exports.deleteTour = async (req, res) => {
   try {
+    // Find document with given id and delete it
     const tour = await Tour.findByIdAndDelete(req.params.id);
+
     if (tour == null) {
       throw Error('No tour');
     }
+
     res.status(204).json({
       status: 'success',
       data: null

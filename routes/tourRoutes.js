@@ -3,21 +3,21 @@ const tourController = require('./../controllers/tourController');
 
 const router = express.Router();
 
-// Create a checkBody middleware
-// if body contains the name and price property
-// if not, send back 400 (bad request)
-// Add it to the post handler stack
-
+// Pre defined route, it adds query to url
 router
   .route('/top-5-cheap')
   .get(tourController.aliasTopTours, tourController.getAllTours);
 
+// Get tours stats using aggregation
 router.route('/tour-stats').get(tourController.getTourStats);
 
+// Get monthly tour plan using aggregation
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
+  // on this route
   .route('/')
+  // use this controllers
   .get(tourController.getAllTours)
   .post(tourController.createTour);
 
@@ -27,4 +27,5 @@ router
   .patch(tourController.updateTour)
   .delete(tourController.deleteTour);
 
+// export router for express app to use it
 module.exports = router;
