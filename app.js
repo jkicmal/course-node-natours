@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -26,6 +28,16 @@ app.use((req, res, next) => {
 // Use routes
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+
+// This middleware will be executed only if any of the routes didn't catch it
+// .all for all requests, '*' for all routes
+app.all('*', (req, res, next) => {
+  // If we pass argument into next function, express will assume that this is an error.
+  next(new AppError(`Can't find ${req.originalUrl} on this server.`, 404));
+});
+
+// 4 arguments means that this is an error handle middleware
+app.use(globalErrorHandler);
 
 // Export app to server
 module.exports = app;
