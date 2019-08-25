@@ -1,14 +1,5 @@
 const AppError = require('../utils/appError');
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    stack: err.stack,
-    error: err
-  });
-};
-
 const handleCastErrorDB = err => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
@@ -20,6 +11,21 @@ const handleDuplicateFieldsDB = err => {
   const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
   const message = `Duplicate field value: ${value}, please use another value!`;
   return new AppError(message, 400);
+};
+
+const handleValidationErrorDB = err => {
+  const errors = Object.values(err.errors).map(el => el.message);
+  const message = `Invalid input data. ${errors.join('. ')}.`;
+  return new AppError(message, 400);
+};
+
+const sendErrorDev = (err, res) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+    stack: err.stack,
+    error: err
+  });
 };
 
 const sendErrorProd = (err, res) => {
@@ -57,6 +63,11 @@ module.exports = (err, req, res, next) => {
 
     // '11000' is mongoose related error for duplicate keys
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+
+    // 'ValidationError' is mongoose error
+    // it consists of errors array (error.errors)
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
 
     sendErrorProd(error, res);
   }
