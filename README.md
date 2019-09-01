@@ -1,14 +1,10 @@
 # Natours App
 Project based on Jonas Schmedtmann [course](https://www.udemy.com/nodejs-express-mongodb-bootcamp/).
 
-### Postman
+### Quick notes
 
-Setting environmental variable based on response.
-Put it in Tests tab.
-
-``` text
-pm.environment.set("jwt", pm.response.json().token);
-```
+- [postman](Postman.md)
+- [security best practices](SecurityBestPractices.md)
 
 ### Packages used
 
