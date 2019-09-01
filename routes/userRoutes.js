@@ -1,9 +1,18 @@
 const express = require('express');
 
 const userController = require('./../controllers/userController');
+const authController = require('./../controllers/authController');
 
 const router = express.Router();
 
+// Auth routes
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
+
+// User resource routes
 router
   .route('/')
   .get(userController.getAllUsers)
