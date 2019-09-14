@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -15,7 +16,10 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // Log requests
 }
 
-// Limit number of requests for ip
+// Set security for HTTP headers
+app.use(helmet());
+
+// Limit number of requests for same ip
 const limiter = rateLimit({
   max: 100, // 100 requests...
   windowMs: 60 * 60 * 1000, // ... per 1 hour
@@ -24,11 +28,13 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Parse body requests to json
-app.use(express.json());
+// Limit body size to 10kb
+app.use(express.json({ lmit: '10kb' }));
 
 // This folder will contain static files like views, media etc.
 app.use(express.static(`${__dirname}/public`));
 
+// Test middleware
 // Every request will contain requested time
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
