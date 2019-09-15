@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const User = require('./userModel');
+// const User = require('./userModel');
 // const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -116,7 +116,13 @@ const tourSchema = new mongoose.Schema(
         day: Number
       }
     ],
-    guides: Array
+    // Points to other document
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   // Schema options object
   {
@@ -141,14 +147,14 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
-tourSchema.pre('save', async function(next) {
-  // Find user for every specified id
-  const guidesPromises = this.guides.map(async id => await User.findById(id));
-  // Guides is now Array of users with previously found ids
-  // Embedding example
-  this.guides = await Promise.all(guidesPromises);
-  next();
-});
+// tourSchema.pre('save', async function(next) {
+//   // Find user for every specified id
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   // Guides is now Array of users with previously found ids
+//   // Embedding example
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // tourSchema.post('save', function(doc, next) {
 //   console.log(doc);
@@ -164,6 +170,15 @@ tourSchema.pre(/^find/, function(next) {
 
   this.start = Date.now(); // Remember that query is just a normal object
 
+  next();
+});
+
+// Fill up guides field with actual data
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  });
   next();
 });
 
