@@ -2,6 +2,10 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
+
+// Generic functions
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
   // Generate query based on request params
@@ -64,20 +68,6 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     data: {
       tour
     }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  // Find document with given id and delete it
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (tour == null) {
-    throw Error('No tour');
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null
   });
 });
 
