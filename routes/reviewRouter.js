@@ -7,10 +7,9 @@ const router = express.Router({ mergeParams: true });
 
 router.route('/:id').get(reviewController.getReview);
 
-// Both:
+// Both are valid:
 // POST /reviews
 // POST /tour/ID/reviews
-// Are valid routes
 // It works because of merged routers
 router
   .route('/')
@@ -18,9 +17,13 @@ router
   .post(
     authController.protect,
     authController.restrictTo('user', 'admin'),
+    reviewController.setTourUserIds,
     reviewController.createReview
   );
 
-router.route('/:id').delete(reviewController.deleteReview);
+router
+  .route('/:id')
+  .delete(reviewController.deleteReview)
+  .patch(reviewController.updateReview);
 
 module.exports = router;

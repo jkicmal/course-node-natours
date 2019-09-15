@@ -4,6 +4,8 @@ const factory = require('./handlerFactory');
 
 // Generic functions
 exports.deleteReview = factory.deleteOne(Review);
+exports.updateReview = factory.updateOne(Review);
+exports.createReview = factory.createOne(Review);
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   let filter = {};
@@ -23,22 +25,15 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createReview = catchAsync(async (req, res, next) => {
+exports.setTourUserIds = (req, res, next) => {
   // If no tour tourId specified, get it from current route
   if (!req.body.tour) req.body.tour = req.params.tourId;
 
   // If no userId specified, get it from currently logged user
   if (!req.body.user) req.body.user = req.user.id;
 
-  const newReview = await Review.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review: newReview
-    }
-  });
-});
+  next();
+};
 
 exports.getReview = catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);

@@ -6,6 +6,8 @@ const factory = require('./handlerFactory');
 
 // Generic functions
 exports.deleteTour = factory.deleteOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.createTour = factory.createOne(Tour);
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
   // Generate query based on request params
@@ -36,32 +38,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
     console.log(tour);
     return next(new AppError('No tour found with that ID.', 404));
   }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  // Create document using requested data
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true, // If not found - add new
-    runValidators: true // Validate data
-  });
 
   res.status(201).json({
     status: 'success',
