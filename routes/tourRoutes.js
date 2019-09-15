@@ -1,8 +1,12 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
 const authController = require('../controllers/authController');
+const reviewRouter = require('./reviewRouter');
 
 const router = express.Router();
+
+// Use different router on this specific path
+router.use('/:tourId/reviews', reviewRouter);
 
 // Pre defined route, it adds query to url
 router

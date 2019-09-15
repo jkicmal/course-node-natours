@@ -138,6 +138,13 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+// Allow access to reviews through tour
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // tour field in review model pointing to this model
+  localField: '_id' // id of current model
+});
+
 // Document middleware
 // Runs before .save() and .create()
 // 'save' is a 'hook'
