@@ -1,11 +1,17 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRouter');
 
 const app = express();
 
@@ -15,7 +21,10 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // Log requests
 }
 
-// Limit number of requests for ip
+// Set security for HTTP headers
+app.use(helmet());
+
+// Limit number of requests for same ip
 const limiter = rateLimit({
   max: 100, // 100 requests...
   windowMs: 60 * 60 * 1000, // ... per 1 hour
@@ -24,11 +33,36 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Parse body requests to json
-app.use(express.json());
+// Limit body size to 10kb
+app.use(express.json({ lmit: '10kb' }));
+
+// Data sanitization against NoSQL query injection
+// It removes $ and . signs from request body
+app.use(mongoSanitize());
+
+// Data sanitization against XSS attacks
+// Converts html signs to html entities eg. < is &lt
+app.use(xss());
+
+// Prevent parameter pollution
+// Only use last parameter
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+);
 
 // This folder will contain static files like views, media etc.
 app.use(express.static(`${__dirname}/public`));
 
+// Test middleware
 // Every request will contain requested time
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -38,6 +72,7 @@ app.use((req, res, next) => {
 // Use routes
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // This middleware will be executed only if any of the routes didn't catch it
 // .all for all requests, '*' for all routes

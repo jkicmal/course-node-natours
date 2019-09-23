@@ -2,6 +2,12 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
+
+// Generic functions
+exports.deleteTour = factory.deleteOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.createTour = factory.createOne(Tour);
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
   // Generate query based on request params
@@ -24,7 +30,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
 
   // If there is no tour but id is correct
   if (!tour) {
@@ -38,46 +44,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
     data: {
       tour
     }
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  // Create document using requested data
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true, // If not found - add new
-    runValidators: true // Validate data
-  });
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  // Find document with given id and delete it
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (tour == null) {
-    throw Error('No tour');
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null
   });
 });
 

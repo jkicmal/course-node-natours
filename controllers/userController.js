@@ -1,6 +1,12 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError.js');
+const factory = require('./handlerFactory');
+
+// Generic functions
+exports.deleteUser = factory.deleteOne(User);
+// Do not update passwords with this
+exports.updateUser = factory.updateOne(User);
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -58,20 +64,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null
   });
 });
-
 exports.getUser = catchAsync(async (req, res, next) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined'
-  });
-});
-exports.updateUser = catchAsync(async (req, res, next) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined'
-  });
-});
-exports.deleteUser = catchAsync(async (req, res, next) => {
   res.status(500).json({
     status: 'error',
     message: 'this route is not yet defined'
