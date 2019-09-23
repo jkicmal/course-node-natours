@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 // Access parameter from other routes (required for nester routes)
 const router = express.Router({ mergeParams: true });
 
-router.route('/:id').get(reviewController.getReview);
+router.use(authController.protect);
 
 // Both are valid:
 // POST /reviews
@@ -15,8 +15,7 @@ router
   .route('/')
   .get(reviewController.getAllReviews)
   .post(
-    authController.protect,
-    authController.restrictTo('user', 'admin'),
+    authController.restrictTo('user'),
     reviewController.setTourUserIds,
     reviewController.createReview
   );
@@ -24,7 +23,13 @@ router
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .delete(reviewController.deleteReview)
-  .patch(reviewController.updateReview);
+  .delete(
+    authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview
+  )
+  .patch(
+    authController.restrictTo('user', 'admin'),
+    reviewController.updateReview
+  );
 
 module.exports = router;
