@@ -1,29 +1,12 @@
 const Review = require('../models/reviewModel');
-const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
 // Generic functions
 exports.deleteReview = factory.deleteOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.createReview = factory.createOne(Review);
-
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-
-  // Thanks to merging params in routers
-  // we can access tour id on specific path
-  if (req.params.tourId) filter = { tour: req.params.tourId };
-
-  const reviews = await Review.find(filter);
-
-  res.status(201).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews
-    }
-  });
-});
+exports.getReview = factory.getOne(Review);
+exports.getAllReviews = factory.getAll(Review);
 
 exports.setTourUserIds = (req, res, next) => {
   // If no tour tourId specified, get it from current route
@@ -34,14 +17,3 @@ exports.setTourUserIds = (req, res, next) => {
 
   next();
 };
-
-exports.getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review
-    }
-  });
-});
