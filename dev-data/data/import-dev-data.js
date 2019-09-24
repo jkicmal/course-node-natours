@@ -39,10 +39,12 @@ const reviews = JSON.parse(
 const importData = async () => {
   try {
     await Tour.create(tours); // Create many tours
-    await User.create(users, { validateBeforeSave: false }); // Create many tours
-    await Review.create(reviews); // Create many tours
+
+    // Remember to comment out hashing functions on user model
+    await User.create(users, { validateBeforeSave: false }); // Create many users
+
+    await Review.create(reviews); // Create many reviews
     console.log('Data successfuly loaded!');
-    process.exit(); // Force exit application
   } catch (err) {
     console.log(err);
   }
@@ -52,18 +54,27 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany(); // Delete all tours
-    await User.deleteMany(); // Delete all tours
-    await Review.deleteMany(); // Delete all tours
+    await User.deleteMany(); // Delete all users
+    await Review.deleteMany(); // Delete all reviews
     console.log('Data successfuly deleted!');
-    process.exit(); // EXIT APPLICATION
   } catch (err) {
     console.log(err);
   }
 };
 
+const refresh = async () => {
+  await deleteData();
+  await importData();
+  process.exit(); // EXIT APPLICATION
+};
+
 // React to command arguments 'node run this-file.js --import'
 if (process.argv[2] === '--import') {
   importData();
+  process.exit(); // EXIT APPLICATION
 } else if (process.argv[2] === '--delete') {
   deleteData();
+  process.exit(); // EXIT APPLICATION
+} else if (process.argv[2] === '--refresh') {
+  refresh();
 }

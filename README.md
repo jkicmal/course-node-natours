@@ -1,10 +1,11 @@
 # Natours App
+
 Project based on Jonas Schmedtmann [course](https://www.udemy.com/nodejs-express-mongodb-bootcamp/).
 
 ### Quick notes
 
-- [postman](Postman.md)
-- [security best practices](SecurityBestPractices.md)
+- [postman](notes/POSTMAN.md)
+- [security best practices](notes/SECURITY.md)
 
 ### Packages used
 

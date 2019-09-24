@@ -50,6 +50,7 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Hashing functions
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
 
@@ -72,6 +73,7 @@ userSchema.pre('save', async function(next) {
 
   next();
 });
+// End of hashing functions
 
 userSchema.pre(/^find/, async function(next) {
   // This points to current query

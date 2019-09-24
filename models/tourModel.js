@@ -42,7 +42,8 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       // Number validators
       min: [1, 'Rating must be above 1.0'], // Also works for dates
-      max: [5, 'Rating must be below 5.0']
+      max: [5, 'Rating must be below 5.0'],
+      set: val => Math.round(val * 10) / 10
     },
     ratingsQuantity: {
       type: Number,
@@ -130,6 +131,13 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true } // Use virtuals when outputing as Object
   }
 );
+
+// 1 order ASC, -1 order DESC
+// tourSchema.index({ price: 1 });
+// Compound index
+// We should index only indexes that are most queried
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
 
 // Define virtual property (does not exist in db, derived from existing data)
 // Has to be a regular function because we need 'this' keyword
