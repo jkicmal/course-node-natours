@@ -138,6 +138,8 @@ const tourSchema = new mongoose.Schema(
 // We should index only indexes that are most queried
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+// This location is indexed to 2dsphere
+tourSchema.index({ startLocation: '2dsphere' });
 
 // Define virtual property (does not exist in db, derived from existing data)
 // Has to be a regular function because we need 'this' keyword
@@ -205,12 +207,12 @@ tourSchema.post(/^find/, function(docs, next) {
 
 // Aggregation middleware
 // 'this' points to the current aggregation
-tourSchema.pre('aggregate', function(next) {
-  // Add another $match at the end of pipeline array
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  // console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function(next) {
+//   // Add another $match at the end of pipeline array
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   // console.log(this.pipeline());
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
